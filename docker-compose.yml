@@ -207,44 +207,44 @@ services:
 
   # WORKER ENGINE
   # Pulls pre-built image from GHCR — no local source required for self-host
-  # worker-engine:
-  #   image: ${IMAGE_REGISTRY}/awe-worker-engine:${IMAGE_TAG:-latest}
-  #   container_name: awe-worker-engine
-  #   restart: unless-stopped
+  worker-engine:
+    image: ${IMAGE_REGISTRY}/awe-engine-worker:${IMAGE_TAG:-latest}
+    container_name: awe-engine-worker
+    restart: unless-stopped
 
-  #   environment:
-  #     ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
 
-  #     # ── RabbitMQ ──────────────────────────────────────────────────────────
-  #     # Key format: Section__Property maps to appsettings: { "RabbitMq": { "Host": ... } }
-  #     RabbitMq__Host: ${RABBITMQ_HOST}
-  #     RabbitMq__Port: ${RABBITMQ_PORT}
-  #     RabbitMq__VirtualHost: ${RABBITMQ_VHOST}
-  #     RabbitMq__Username: ${RABBITMQ_USERNAME}
-  #     RabbitMq__Password: ${RABBITMQ_PASSWORD}
-  #     RabbitMq__PrefetchCount: ${MT_PREFETCH_COUNT:-16}
+      # ── RabbitMQ ──────────────────────────────────────────────────────────
+      # Key format: Section__Property maps to appsettings: { "RabbitMq": { "Host": ... } }
+      RabbitMq__Host: ${RABBITMQ_HOST}
+      RabbitMq__Port: ${RABBITMQ_PORT}
+      RabbitMq__VirtualHost: ${RABBITMQ_VHOST}
+      RabbitMq__Username: ${RABBITMQ_USERNAME}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD}
+      RabbitMq__PrefetchCount: ${MT_PREFETCH_COUNT:-16}
 
-  #     # ── Database ──────────────────────────────────────────────────────────
-  #     ConnectionStrings__postgres: Host=awe-postgres;Port=5432;Database=awe_db;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-  #     ConnectionStrings__Redis: awe-redis:6379,password=${REDIS_PASSWORD},abortConnect=false
+      # ── Database ──────────────────────────────────────────────────────────
+      ConnectionStrings__postgres: Host=awe-postgres;Port=5432;Database=awe_db;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      ConnectionStrings__Redis: awe-redis:6379,password=${REDIS_PASSWORD},abortConnect=false
 
-  #     # ── MinIO ─────────────────────────────────────────────────────────────
-  #     Minio__Endpoint: ${MINIO_ENDPOINT:-awe-minio:9000}
-  #     Minio__AccessKey: ${MINIO_ROOT_USER}
-  #     Minio__SecretKey: ${MINIO_ROOT_PASSWORD}
-  #     Minio__BucketName: awe-plugins
-  #     Minio__UseSSL: "false"
+      # ── MinIO ─────────────────────────────────────────────────────────────
+      Minio__Endpoint: ${MINIO_ENDPOINT:-awe-minio:9000}
+      Minio__AccessKey: ${MINIO_ROOT_USER}
+      Minio__SecretKey: ${MINIO_ROOT_PASSWORD}
+      Minio__BucketName: awe-plugins
+      Minio__UseSSL: "false"
 
-  #     # ── Telegram Alerts (optional) ────────────────────────────────────────
-  #     TelegramNotificationConfig__BotToken: ${TELEGRAM_BOT_TOKEN:-}
-  #     TelegramNotificationConfig__ChatID: ${TELEGRAM_CHAT_ID:-}
+      # ── Telegram Alerts (optional) ────────────────────────────────────────
+      TelegramNotificationConfig__BotToken: ${TELEGRAM_BOT_TOKEN:-}
+      TelegramNotificationConfig__ChatID: ${TELEGRAM_CHAT_ID:-}
 
-  #   depends_on:
-  #     rabbitmq:
-  #       condition: service_healthy
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
-  #   networks:
-  #     - awe-network
+    networks:
+      - awe-network
 
   # API GATEWAY
   api-gateway:

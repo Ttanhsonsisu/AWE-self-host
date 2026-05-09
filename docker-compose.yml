@@ -179,7 +179,7 @@ services:
       - "${DASHBOARD_OTLP_PORT:-19889}:18889"
       - "${DASHBOARD_OTLP_HTTP_PORT:-19890}:18890"
     environment:
-      - DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true
+      - DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=Unsecured
       # --- 3. Cấu hình OTLP ---
       - Dashboard__Otlp__AuthMode=ApiKey
       - Dashboard__Otlp__PrimaryApiKey=${DASHBOARD_OTLP_TOKEN}

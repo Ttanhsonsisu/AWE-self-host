@@ -197,6 +197,11 @@ services:
 
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      
+      # ── Observability / OpenTelemetry ─────────────────────────────────────
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://awe-aspire-dashboard:18889
+      OTEL_EXPORTER_OTLP_HEADERS: x-otlp-api-key=${DASHBOARD_OTLP_TOKEN}
+      OTEL_SERVICE_NAME: awe-worker-engine
 
       # ── RabbitMQ ──────────────────────────────────────────────────────────
       # Key format: Section__Property maps to appsettings: { "RabbitMq": { "Host": ... } }
@@ -237,6 +242,11 @@ services:
 
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+
+      # ── Observability / OpenTelemetry ─────────────────────────────────────
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://awe-aspire-dashboard:18889
+      OTEL_EXPORTER_OTLP_HEADERS: x-otlp-api-key=${DASHBOARD_OTLP_TOKEN}
+      OTEL_SERVICE_NAME: awe-api-gateway
 
       # ── RabbitMQ ──────────────────────────────────────────────────────────
       RabbitMq__Host: ${RABBITMQ_HOST}
@@ -284,6 +294,11 @@ services:
 
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+
+      # ── Observability / OpenTelemetry ─────────────────────────────────────
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://awe-aspire-dashboard:18889
+      OTEL_EXPORTER_OTLP_HEADERS: x-otlp-api-key=${DASHBOARD_OTLP_TOKEN}
+      OTEL_SERVICE_NAME: awe-plugin-worker
 
       # ── RabbitMQ ──────────────────────────────────────────────────────────
       RabbitMq__Host: ${RABBITMQ_HOST}

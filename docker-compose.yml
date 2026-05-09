@@ -177,21 +177,9 @@ services:
     ports:
       - "${DASHBOARD_UI_PORT:-19888}:18888"
       - "${DASHBOARD_OTLP_PORT:-19889}:18889"
+      - "${DASHBOARD_OTLP_HTTP_PORT:-19890}:18890"
     environment:
-      - DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=false
-
-      # --- 1. Kích hoạt SSO ---
-      - Dashboard__Frontend__AuthMode=OpenIdConnect
-      
-      # --- 2. Bơm TRỰC TIẾP vào lõi OIDC của ASP.NET Core ---
-      # Đây là cách duy nhất ép Standalone Dashboard nhận ClientId
-      - Authentication__Schemes__OpenIdConnect__Authority=http://localhost:8081/realms/awe-auth
-      - Authentication__Schemes__OpenIdConnect__MetadataAddress=http://awe-keycloak:8080/realms/awe-auth/.well-known/openid-configuration
-      - Authentication__Schemes__OpenIdConnect__ClientId=${ASPIRE_OIDC_CLIENT_ID:-aspire-dashboard}
-      - Authentication__Schemes__OpenIdConnect__ClientSecret=${OIDC_CLIENT_SECRET}
-      - Authentication__Schemes__OpenIdConnect__RequireHttpsMetadata=false
-      - Authentication__Schemes__OpenIdConnect__ResponseType=code
-
+      - DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true
       # --- 3. Cấu hình OTLP ---
       - Dashboard__Otlp__AuthMode=ApiKey
       - Dashboard__Otlp__PrimaryApiKey=${DASHBOARD_OTLP_TOKEN}
@@ -224,7 +212,7 @@ services:
       ConnectionStrings__Redis: awe-redis:6379,password=${REDIS_PASSWORD},abortConnect=false
 
       # ── MinIO ─────────────────────────────────────────────────────────────
-      Minio__Endpoint: ${MINIO_ENDPOINT:-awe-minio:9000}
+      Minio__Endpoint: ${MINIO_ENDPOINT:-minio:9000}
       Minio__AccessKey: ${MINIO_ROOT_USER}
       Minio__SecretKey: ${MINIO_ROOT_PASSWORD}
       Minio__BucketName: awe-plugins

@@ -171,7 +171,7 @@ services:
 
   # ASPIRE DASHBOARD
   aspire-dashboard:
-    image: mcr.microsoft.com/dotnet/aspire-dashboard:13
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.0
     container_name: awe-aspire-dashboard
     restart: unless-stopped
     ports:
@@ -180,22 +180,28 @@ services:
     environment:
       - DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=false
 
-      # --- 1. SSO via Keycloak ---
-      # Aspire Dashboard uses its OWN dedicated Keycloak client (ASPIRE_OIDC_CLIENT_ID),
-      # separate from the React frontend client (OIDC_FE_CLIENT_ID).
-      # Authority here uses the INTERNAL Docker DNS since the Dashboard talks to Keycloak
-      # server-side (not from the browser).
+      # --- 1. Cấu hình Đăng nhập (SSO via Keycloak) ---
       - Dashboard__Frontend__AuthMode=OpenIdConnect
-      - Dashboard__Frontend__OpenIdConnect__Authority=${KEYCLOAK_INTERNAL_AUTHORITY:-http://awe-keycloak:8080/realms/awe-auth}
+      
+      # URL 1: DÀNH CHO TRÌNH DUYỆT (Chuyển hướng người dùng đăng nhập)
+      # Trỏ ra localhost để trình duyệt của bạn hiểu được
+      - Dashboard__Frontend__OpenIdConnect__Authority=${OIDC_AUTHORITY:-http://localhost:8081/realms/awe-auth}
+      
+      # URL 2: DÀNH CHO CONTAINER (Aspire gọi ngầm Keycloak lấy khóa bảo mật)
+      # Trỏ vào mạng nội bộ Docker để vượt tường lửa
+      - Dashboard__Frontend__OpenIdConnect__MetadataAddress=http://awe-keycloak:8080/realms/awe-auth/.well-known/openid-configuration
+      
       - Dashboard__Frontend__OpenIdConnect__ClientId=${ASPIRE_OIDC_CLIENT_ID:-aspire-dashboard}
       - Dashboard__Frontend__OpenIdConnect__ClientSecret=${OIDC_CLIENT_SECRET}
+      
+      # Bắt buộc tắt cờ bắt buộc dùng HTTPS khi đang test ở Local
       - Dashboard__Frontend__OpenIdConnect__RequireHttpsMetadata=false
 
-      # --- 2. Protect the OTLP ingestion endpoint with an API key ---
+      # --- 2. Cấu hình nhận Telemetry (Log/Trace/Metric) từ API gửi về ---
       - Dashboard__Otlp__AuthMode=ApiKey
       - Dashboard__Otlp__PrimaryApiKey=${DASHBOARD_OTLP_TOKEN}
 
-      # --- 3. Memory limits to prevent OOM on constrained hosts ---
+      # --- 3. Giới hạn bộ nhớ lưu trữ log trên RAM (Chống tràn RAM) ---
       - Dashboard__TelemetryLimits__MaxLogCount=10000
       - Dashboard__TelemetryLimits__MaxTraceCount=10000
       - Dashboard__TelemetryLimits__MaxMetricsCount=50000

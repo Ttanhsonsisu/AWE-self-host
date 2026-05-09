@@ -276,7 +276,7 @@ services:
 
       # ── Keycloak (internal DNS — JWT validation is server-side) ───────────
       Keycloak__Authority: ${KEYCLOAK_INTERNAL_AUTHORITY:-http://awe-keycloak:8080/realms/awe-auth}
-
+      Keycloak__ValidIssuer: ${OIDC_AUTHORITY}
       # ── Telegram Alerts (optional) ────────────────────────────────────────
       TelegramNotificationConfig__BotToken: ${TELEGRAM_BOT_TOKEN:-}
       TelegramNotificationConfig__ChatID: ${TELEGRAM_CHAT_ID:-}

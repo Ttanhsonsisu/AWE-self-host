@@ -52,7 +52,7 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     container_name: awe-keycloak
-    command: start-dev --import-realm
+    command: start-dev --import-realm --metrics-enabled=true
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak_db
@@ -168,6 +168,32 @@ services:
       
       echo 'SETUP COMPLETED SUCCESSFULLY!'
       "
+
+  # POSTGRES EXPORTER (Cho Metrics Database)
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    container_name: awe-postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/awe_db?sslmode=disable"
+    networks:
+      - awe-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # OTEL COLLECTOR (Bộ thu gom dữ liệu tập trung)
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: awe-otel-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    environment:
+      - DASHBOARD_OTLP_TOKEN=${DASHBOARD_OTLP_TOKEN}
+    networks:
+      - awe-network
+    depends_on:
+      - aspire-dashboard
 
   # ASPIRE DASHBOARD
   aspire-dashboard:

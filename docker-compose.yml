@@ -171,7 +171,7 @@ services:
 
   # ASPIRE DASHBOARD
   aspire-dashboard:
-    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.0
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:13
     container_name: awe-aspire-dashboard
     restart: unless-stopped
     ports:
@@ -180,31 +180,21 @@ services:
     environment:
       - DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=false
 
-      # --- 1. Cấu hình Đăng nhập (SSO via Keycloak) ---
+      # --- 1. Kích hoạt SSO ---
       - Dashboard__Frontend__AuthMode=OpenIdConnect
       
-      # URL 1: DÀNH CHO TRÌNH DUYỆT (Chuyển hướng người dùng đăng nhập)
-      # Trỏ ra localhost để trình duyệt của bạn hiểu được
-      - Dashboard__Frontend__OpenIdConnect__Authority=${OIDC_AUTHORITY:-http://localhost:8081/realms/awe-auth}
-      
-      # URL 2: DÀNH CHO CONTAINER (Aspire gọi ngầm Keycloak lấy khóa bảo mật)
-      # Trỏ vào mạng nội bộ Docker để vượt tường lửa
-      - Dashboard__Frontend__OpenIdConnect__MetadataAddress=http://awe-keycloak:8080/realms/awe-auth/.well-known/openid-configuration
-      
-      - Dashboard__Frontend__OpenIdConnect__ClientId=${ASPIRE_OIDC_CLIENT_ID:-aspire-dashboard}
-      - Dashboard__Frontend__OpenIdConnect__ClientSecret=${OIDC_CLIENT_SECRET}
-      
-      # Bắt buộc tắt cờ bắt buộc dùng HTTPS khi đang test ở Local
-      - Dashboard__Frontend__OpenIdConnect__RequireHttpsMetadata=false
+      # --- 2. Bơm TRỰC TIẾP vào lõi OIDC của ASP.NET Core ---
+      # Đây là cách duy nhất ép Standalone Dashboard nhận ClientId
+      - Authentication__Schemes__OpenIdConnect__Authority=http://localhost:8081/realms/awe-auth
+      - Authentication__Schemes__OpenIdConnect__MetadataAddress=http://awe-keycloak:8080/realms/awe-auth/.well-known/openid-configuration
+      - Authentication__Schemes__OpenIdConnect__ClientId=${ASPIRE_OIDC_CLIENT_ID:-aspire-dashboard}
+      - Authentication__Schemes__OpenIdConnect__ClientSecret=${OIDC_CLIENT_SECRET}
+      - Authentication__Schemes__OpenIdConnect__RequireHttpsMetadata=false
+      - Authentication__Schemes__OpenIdConnect__ResponseType=code
 
-      # --- 2. Cấu hình nhận Telemetry (Log/Trace/Metric) từ API gửi về ---
+      # --- 3. Cấu hình OTLP ---
       - Dashboard__Otlp__AuthMode=ApiKey
       - Dashboard__Otlp__PrimaryApiKey=${DASHBOARD_OTLP_TOKEN}
-
-      # --- 3. Giới hạn bộ nhớ lưu trữ log trên RAM (Chống tràn RAM) ---
-      - Dashboard__TelemetryLimits__MaxLogCount=10000
-      - Dashboard__TelemetryLimits__MaxTraceCount=10000
-      - Dashboard__TelemetryLimits__MaxMetricsCount=50000
     networks:
       - awe-network
     depends_on:

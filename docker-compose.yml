@@ -12,6 +12,16 @@ volumes:
 
 services:
 
+  cloudflare-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: awe-cloudflare-tunnel
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - awe-network
+
   #MINI IO
   minio:
     image: minio/minio:latest
@@ -63,6 +73,8 @@ services:
       KC_HOSTNAME_STRICT: "false"
       KC_HTTP_ENABLED: "true"
       OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+      KC_PROXY: "edge"     
+      KC_PROXY_HEADERS: "xforwarded"
     ports:
       - "${KEYCLOAK_PORT:-8081}:8080"
     volumes:

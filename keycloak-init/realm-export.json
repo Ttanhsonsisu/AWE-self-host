@@ -1,4 +1,4 @@
-﻿{
+{
   "id": "4363490a-a17c-4f51-8be0-4782ac379fa7",
   "realm": "awe-auth",
   "notBefore": 0,
@@ -747,10 +747,10 @@
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "http://localhost:5173/*"
+        "${OIDC_REDIRECT_URI:http://localhost/}*"
       ],
       "webOrigins": [
-        "http://localhost:5173"
+        "${OIDC_WEB_ORIGIN:http://localhost}"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -770,7 +770,7 @@
         "oauth2.jwt.authorization.grant.enabled": "false",
         "standard.token.exchange.enabled": "false",
         "frontchannel.logout.session.required": "true",
-        "post.logout.redirect.uris": "http://localhost:5173/*",
+        "post.logout.redirect.uris": "${OIDC_POST_LOGOUT_REDIRECT_URI:http://localhost/}*",
         "display.on.consent.screen": "false",
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.revoke.offline.tokens": "false",

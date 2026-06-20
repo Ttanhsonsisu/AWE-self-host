@@ -34,6 +34,8 @@ services:
       - "${MINIO_MANAGEMENT_PORT}:9001"
     volumes:
       - minio-data:/data 
+    networks:
+      - awe-network
   # DATABASE POSTGRESQL
   postgres:
       image: postgres:${POSTGRES_IMAGE_TAG}
@@ -75,6 +77,9 @@ services:
       OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
       KC_PROXY: "edge"     
       KC_PROXY_HEADERS: "xforwarded"
+      OIDC_REDIRECT_URI: ${OIDC_REDIRECT_URI}
+      OIDC_POST_LOGOUT_REDIRECT_URI: ${OIDC_POST_LOGOUT_REDIRECT_URI}
+      OIDC_WEB_ORIGIN: ${OIDC_WEB_ORIGIN}
     ports:
       - "${KEYCLOAK_PORT:-8081}:8080"
     volumes:
@@ -299,7 +304,7 @@ services:
       ConnectionStrings__Redis: awe-redis:6379,password=${REDIS_PASSWORD},abortConnect=false
 
       # ── MinIO ─────────────────────────────────────────────────────────────
-      Minio__Endpoint: ${MINIO_ENDPOINT:-awe-minio:9000}
+      Minio__Endpoint: ${MINIO_ENDPOINT:-minio:9000}
       Minio__AccessKey: ${MINIO_ROOT_USER}
       Minio__SecretKey: ${MINIO_ROOT_PASSWORD}
       Minio__BucketName: awe-plugins
@@ -351,7 +356,7 @@ services:
       ConnectionStrings__Redis: awe-redis:6379,password=${REDIS_PASSWORD},abortConnect=false
 
       # ── MinIO (plugin storage) ──────────────────────────────────────────
-      Minio__Endpoint: ${MINIO_ENDPOINT:-awe-minio:9000}
+      Minio__Endpoint: ${MINIO_ENDPOINT:-minio:9000}
       Minio__AccessKey: ${MINIO_ROOT_USER}
       Minio__SecretKey: ${MINIO_ROOT_PASSWORD}
       Minio__BucketName: awe-plugins
@@ -388,7 +393,7 @@ services:
     networks:
       - awe-network
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/"]
       interval: 30s
       timeout: 5s
       start_period: 10s
